@@ -1,10 +1,7 @@
 #include <iostream>
-#include <thread>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-using namespace std::chrono_literals;
 
 // Window dimensions
 static GLint const kWidth{800};
@@ -28,6 +25,8 @@ float NormalizeColor(int value) {
   }
   return ret;
 }
+
+void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 int main() {
   if (!glfwInit()) {
@@ -69,6 +68,8 @@ int main() {
   // Setup Viewport size
   glViewport(0, 0, buffer_width, buffer_height);
 
+  glfwSetKeyCallback(main_window, OnKey);
+
   // Loop until window closed
   while (!glfwWindowShouldClose(main_window)) {
     static int iter{0};
@@ -81,10 +82,16 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glfwSwapBuffers(main_window);
-    std::this_thread::sleep_for(1ms);
+
     iter++;
   }
 
   glfwTerminate();
   return 0;
+}
+
+void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, GL_TRUE);
+  }
 }
