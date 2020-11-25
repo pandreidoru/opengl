@@ -7,12 +7,14 @@
 // Window dimensions
 static GLint const kWidth{800};
 static GLint const kHeight{600};
-static char const *const kAppTitle = "TEO";
+static char const* const kAppTitle = "TEO";
 static int const kColorMin{0};
 static int const kColorMax{255};
 
-void OnKey(GLFWwindow *window, int key, int scancode, int action, int mode);
-void ShowFPS(GLFWwindow *window);
+bool full_screen{false};
+
+void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
+void ShowFPS(GLFWwindow* window);
 float NormalizeColor(int value);
 
 int main() {
@@ -27,7 +29,15 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // No Backwards Compatibility
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  GLFWwindow *main_window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
+  GLFWwindow* main_window = nullptr;
+  if (full_screen) {
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    GLFWvidmode const* vidmode = glfwGetVideoMode(monitor);
+    main_window = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
+  } else {
+    main_window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
+  }
+
   if (!main_window) {
     std::cerr << "GLFW window creation failed!\n";
     glfwTerminate();
@@ -79,13 +89,13 @@ int main() {
   return 0;
 }
 
-void OnKey(GLFWwindow *window, int key, int scancode, int action, int mode) {
+void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GL_TRUE);
   }
 }
 
-void ShowFPS(GLFWwindow *window) {
+void ShowFPS(GLFWwindow* window) {
   static double prev_time{0};
   static int frame_count{0};
   double cur_time = glfwGetTime();
