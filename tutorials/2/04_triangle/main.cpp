@@ -5,98 +5,98 @@
 #include <GLFW/glfw3.h>
 
 // Window dimensions
-static GLint const kWidth{800};
-static GLint const kHeight{600};
+static int const kWidth{800};
+static int const kHeight{600};
 static char const* const kAppTitle = "TEO";
 static int const kColorMin{0};
 static int const kColorMax{255};
 
 bool g_full_screen{false};
-GLFWwindow *g_window{nullptr};
 
+GLFWwindow* InitOpenGL();
+void CleanOpenGL(std::string const& text);
 void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void ShowFPS(GLFWwindow* window);
 float NormalizeColor(int value);
-bool InitOpenGL();
 
 int main() {
-  if (!InitOpenGL()) {
-    std::cerr << "GLFW initialization failed!\n";
-    return EXIT_FAILURE;
-  }
+  int ret{EXIT_SUCCESS};
+  auto window = InitOpenGL();
+  if (window) {
+    // Loop until window closed
+    while (!glfwWindowShouldClose(window)) {
+      static int iter{0};
 
-  // Loop until window closed
-  while (!glfwWindowShouldClose(g_window)) {
-    ShowFPS(g_window);
+      ShowFPS(window);
 
-    static int iter{0};
-    // Get + Handle user input events
-    glfwPollEvents();
+      // Get + Handle user input events
+      glfwPollEvents();
 
-    // Clear window
-    // Set color (R, G, B, alpha)
-    glClearColor(0, 0, NormalizeColor(iter % (kColorMax + 1)), 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+      // Set color (R, G, B, alpha)
+      glClearColor(0, 0, NormalizeColor(iter % (kColorMax + 1)), 1.0);
+      glClear(GL_COLOR_BUFFER_BIT);
 
-    glfwSwapBuffers(g_window);
+      glfwSwapBuffers(window);
 
-    iter++;
+      iter++;
+    }
+  } else {
+    ret = EXIT_FAILURE;
   }
 
   glfwTerminate();
-  return 0;
+  return ret;
 }
 
-bool InitOpenGL() {
-  if (!glfwInit()) {
-    std::cerr << "GLFW initialization failed!\n";
-    glfwTerminate();
-    return false;
-  }
+GLFWwindow* InitOpenGL() {
+  GLFWwindow* window{nullptr};
+  if (glfwInit()) {
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // No Backwards Compatibility
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // No Backwards Compatibility
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    if (g_full_screen) {
+      GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+      GLFWvidmode const* vidmode = glfwGetVideoMode(monitor);
+      window = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
+    } else {
+      window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
+    }
 
-  if (g_full_screen) {
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    GLFWvidmode const* vidmode = glfwGetVideoMode(monitor);
-    g_window = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
+    if (window) {
+      int buffer_width;
+      int buffer_height;
+      glfwGetFramebufferSize(window, &buffer_width, &buffer_height);
+
+      // Set context for GLEW to use
+      glfwMakeContextCurrent(window);
+
+      // Allow modern extension features
+      glewExperimental = GL_TRUE;
+
+      if (glewInit() == GLEW_OK) {
+        // Setup Viewport size
+        glViewport(0, 0, buffer_width, buffer_height);
+        glfwSetKeyCallback(window, OnKey);
+      } else {
+        CleanOpenGL("GLEW initialization failed!\n");
+        glfwDestroyWindow(window);
+        window = nullptr;
+      }
+    } else {
+      CleanOpenGL("GLFW window creation failed!\n");
+    }
   } else {
-    g_window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
+    CleanOpenGL("GLFW initialization failed!\n");
   }
 
-  if (!g_window) {
-    std::cerr << "GLFW window creation failed!\n";
-    glfwTerminate();
-    return false;
-  }
+  return window;
+}
 
-  // Get buffer size information
-  int buffer_width;
-  int buffer_height;
-  glfwGetFramebufferSize(g_window, &buffer_width, &buffer_height);
-
-  // Set context for GLEW to use
-  glfwMakeContextCurrent(g_window);
-
-  // Allow modern extension features
-  glewExperimental = GL_TRUE;
-
-  if (glewInit() != GLEW_OK) {
-    std::cout << "GLEW initialization failed!\n";
-    glfwDestroyWindow(g_window);
-    glfwTerminate();
-    return false;
-  }
-
-  // Setup Viewport size
-  glViewport(0, 0, buffer_width, buffer_height);
-
-  glfwSetKeyCallback(g_window, OnKey);
-
-  return true;
+void CleanOpenGL(std::string const& msg) {
+  std::cerr << msg;
+  glfwTerminate();
 }
 
 void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
@@ -132,7 +132,7 @@ void ShowFPS(GLFWwindow* window) {
 }
 
 float NormalizeColor(int value) {
-  float ret;
+  float ret{0};
   if (value < kColorMin) {
     std::cerr << "Color value " << value << " less than " << kColorMin
               << ". It is converted to " << kColorMin << "\n";
