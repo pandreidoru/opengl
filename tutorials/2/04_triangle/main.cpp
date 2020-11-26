@@ -5,16 +5,28 @@
 #include <GLFW/glfw3.h>
 
 // Window dimensions
-static int const kWidth{800};
-static int const kHeight{600};
-static char const* const kAppTitle = "TEO";
+static GLint const kWidth{800};
+static GLint const kHeight{600};
+static char const* const kAppTitle = "Triangle";
 static int const kColorMin{0};
 static int const kColorMax{255};
 
-bool g_full_screen{false};
+const GLchar* vertex_shader_src =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 pos;"
+    "void main() {"
+    "  gl_Position = vec4(pos, 1.0);"
+    "}";
+
+const GLchar* fragment_shader_src =
+    "#version 330 core\n"
+    "out vec4 frag_color;"
+    "void main() {"
+    "  frag_color = vec4(1, 0, 0, 1);"
+    "}";
 
 GLFWwindow* InitOpenGL();
-void CleanOpenGL(std::string const& text);
+void CleanOpenGL(std::string const& msg);
 void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void ShowFPS(GLFWwindow* window);
 float NormalizeColor(int value);
@@ -23,23 +35,86 @@ int main() {
   int ret{EXIT_SUCCESS};
   auto window = InitOpenGL();
   if (window) {
+    int const kVerticesNumber{3};
+    auto normalized{GL_FALSE};
+    auto stride{0};
+    void* offset{nullptr};
+    GLfloat vertices[] = {
+        0.0f, 0.5f, 0.0f,  // Top
+        0.5f, -0.5f, 0.0f,  // Right
+        -0.5f, -0.5f, 0.0f,  // Left
+    };
+
+    GLuint vbo;  // vertex buffer object
+    // Generate 1 buffer object
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // STATIC - The data store contents will be modified once and used many times.
+    // DRAW - The data store contents are modified by the application, and used as the source for GL drawing and image
+    // specification commands.
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    GLuint vao;  // vertex array object
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glVertexAttribPointer(0, kVerticesNumber, GL_FLOAT, normalized, stride, offset);
+    glEnableVertexAttribArray(0);
+
+    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vs, 1, &vertex_shader_src, nullptr);
+    glCompileShader(vs);
+    GLint result;
+    GLchar info_log[512];
+    glGetShaderiv(vs, GL_COMPILE_STATUS, &result);
+    if (!result) {
+      glGetShaderInfoLog(vs, sizeof(info_log), nullptr, info_log);
+      std::cerr << "Error: Vertex shader failed to compile: " << info_log << std::endl;
+    }
+
+    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs, 1, &fragment_shader_src, nullptr);
+    glCompileShader(fs);
+    glGetShaderiv(vs, GL_COMPILE_STATUS, &result);
+    if (!result) {
+      glGetShaderInfoLog(vs, sizeof(info_log), nullptr, info_log);
+      std::cerr << "Error: Fragment shader failed to compile: " << info_log << std::endl;
+    }
+
+    GLuint shader_program = glCreateProgram();
+    glAttachShader(shader_program, vs);
+    glAttachShader(shader_program, fs);
+    glLinkProgram(shader_program);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &result);
+    if (!result) {
+      glGetProgramInfoLog(shader_program, sizeof(info_log), nullptr, info_log);
+      std::cerr << "Error: Shader Program linker failure: " << info_log << std::endl;
+    }
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
     // Loop until window closed
     while (!glfwWindowShouldClose(window)) {
-      static int iter{0};
-
       ShowFPS(window);
 
       // Get + Handle user input events
       glfwPollEvents();
 
       // Set color (R, G, B, alpha)
-      glClearColor(0, 0, NormalizeColor(iter % (kColorMax + 1)), 1.0);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glfwSwapBuffers(window);
+      glUseProgram(shader_program);
 
-      iter++;
+      glBindVertexArray(vao);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glBindVertexArray(0);
+
+      glfwSwapBuffers(window);
     }
+    glDeleteProgram(shader_program);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
   } else {
     ret = EXIT_FAILURE;
   }
@@ -56,13 +131,7 @@ GLFWwindow* InitOpenGL() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // No Backwards Compatibility
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    if (g_full_screen) {
-      GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-      GLFWvidmode const* vidmode = glfwGetVideoMode(monitor);
-      window = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
-    } else {
-      window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
-    }
+    window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
 
     if (window) {
       int buffer_width;
@@ -79,6 +148,8 @@ GLFWwindow* InitOpenGL() {
         // Setup Viewport size
         glViewport(0, 0, buffer_width, buffer_height);
         glfwSetKeyCallback(window, OnKey);
+
+        glClearColor(0, 0, 1, 1.0);
       } else {
         CleanOpenGL("GLEW initialization failed!\n");
         glfwDestroyWindow(window);
