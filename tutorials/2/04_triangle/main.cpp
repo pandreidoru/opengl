@@ -14,15 +14,19 @@ static int const kColorMax{255};
 const GLchar* vertex_shader_src =
     "#version 330 core\n"
     "layout (location = 0) in vec3 pos;"
+    "layout (location = 1) in vec3 color;"
+    "out vec3 vert_color;"
     "void main() {"
-    "  gl_Position = vec4(pos, 1.0);"
+    "  vert_color = color;"
+    "  gl_Position = vec4(pos, 1.0f);"
     "}";
 
 const GLchar* fragment_shader_src =
     "#version 330 core\n"
+    "in vec3 vert_color;"
     "out vec4 frag_color;"
     "void main() {"
-    "  frag_color = vec4(1, 0, 0, 1);"
+    "  frag_color = vec4(vert_color, 1.0f);"
     "}";
 
 GLFWwindow* InitOpenGL();
@@ -37,13 +41,17 @@ int main() {
   if (window) {
     int const kVerticesNumber{3};
     auto normalized{GL_FALSE};
-    auto stride{0};
-    void* offset{nullptr};
+    auto stride{sizeof(GLfloat) * 6};
+    GLvoid* position_offset{nullptr};
+    auto color_offset{sizeof(GLfloat) * 3};
+    // Vertex Buffer Object Interleaved Layout
+    // clang-format off
     GLfloat vertices[] = {
-        0.0f, 0.5f, 0.0f,  // Top
-        0.5f, -0.5f, 0.0f,  // Right
-        -0.5f, -0.5f, 0.0f,  // Left
+         0.0f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f,  // Top, Red
+         0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f,  // Right, Green
+        -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f   // Left, Blue
     };
+    // clang-format on
 
     GLuint vbo;  // vertex buffer object
     // Generate 1 buffer object
@@ -58,8 +66,12 @@ int main() {
     GLuint vao;  // vertex array object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    glVertexAttribPointer(0, kVerticesNumber, GL_FLOAT, normalized, stride, offset);
+    // position
+    glVertexAttribPointer(0, kVerticesNumber, GL_FLOAT, normalized, stride, position_offset);
     glEnableVertexAttribArray(0);
+    // color
+    glVertexAttribPointer(1, kVerticesNumber, GL_FLOAT, normalized, stride, (GLvoid *)(color_offset));
+    glEnableVertexAttribArray(1);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertex_shader_src, nullptr);

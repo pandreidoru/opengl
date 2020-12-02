@@ -5,6 +5,7 @@
     - [Tutorials](#tutorials)
     - [Websites](#websites)
   - [Basic steps for creating shaders](#basic-steps-for-creating-shaders)
+  - [Vertex Buffer Object Layout](#vertex-buffer-object-layout)
   - [Install](#install)
     - [GLEW](#glew)
     - [GLFW](#glfw)
@@ -106,6 +107,20 @@
    glUseProgram(shader_program);
    glDeleteProgram(shader_program);
    ```
+
+## Vertex Buffer Object Layout
+
+- All layouts
+
+![Vertex Buffer Object Layout](vertex_buffer_object_layouts.png)
+
+- Position layout
+
+![Vertex Buffer Object Layout](vertex_buffer_object_layout_position.png)
+
+- Interleaved layout
+
+![Vertex Buffer Object Layout](vertex_buffer_object_layout_interleaved.png)
 
 ## Install
 
