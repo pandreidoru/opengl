@@ -1,23 +1,45 @@
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// Window dimensions
 static GLint const kWidth{800};
 static GLint const kHeight{600};
 static char const* const kAppTitle = "TEO";
 static int const kColorMin{0};
 static int const kColorMax{255};
 
-bool g_full_screen{false};
-GLFWwindow *g_window{nullptr};
+bool gFullScreen{false};
+GLFWwindow* gWindow{nullptr};
+
+GLuint VAO, VBO, gShader;
+
+// Vertex Shader
+static char const* vShader =
+    "#version 330 \n"
+    "layout (location = 0) in vec3 pos;"
+    ""
+    "void main() {"
+    "  gl_Position = vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0f);"
+    "}";
+
+static char const* fShader =
+    "#version 330 \n"
+    "out vec4 color;"
+    ""
+    "void main() {"
+    "  color = vec4(1.0f, 0.0f, 0.0f, 1.0f);"
+    "}";
 
 void OnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void ShowFPS(GLFWwindow* window);
 float NormalizeColor(int value);
 bool InitOpenGL();
+void CreateTriangle();
+void AddShader(GLuint program, char const* code, GLenum type);
+void CompileShaders();
 
 int main() {
   if (!InitOpenGL()) {
@@ -25,9 +47,12 @@ int main() {
     return EXIT_FAILURE;
   }
 
+  CreateTriangle();
+  CompileShaders();
+
   // Loop until window closed
-  while (!glfwWindowShouldClose(g_window)) {
-    ShowFPS(g_window);
+  while (!glfwWindowShouldClose(gWindow)) {
+    ShowFPS(gWindow);
 
     static int iter{0};
     // Get + Handle user input events
@@ -38,7 +63,13 @@ int main() {
     glClearColor(0, 0, NormalizeColor(iter % (kColorMax + 1)), 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glfwSwapBuffers(g_window);
+    glUseProgram(gShader);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(0);
+    glUseProgram(0);
+
+    glfwSwapBuffers(gWindow);
 
     iter++;
   }
@@ -59,15 +90,15 @@ bool InitOpenGL() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // No Backwards Compatibility
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  if (g_full_screen) {
+  if (gFullScreen) {
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     GLFWvidmode const* vidmode = glfwGetVideoMode(monitor);
-    g_window = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
+    gWindow = glfwCreateWindow(vidmode->width, vidmode->height, kAppTitle, monitor, nullptr);
   } else {
-    g_window = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
+    gWindow = glfwCreateWindow(kWidth, kHeight, kAppTitle, nullptr, nullptr);
   }
 
-  if (!g_window) {
+  if (!gWindow) {
     std::cerr << "GLFW window creation failed!\n";
     glfwTerminate();
     return false;
@@ -76,17 +107,17 @@ bool InitOpenGL() {
   // Get buffer size information
   int buffer_width;
   int buffer_height;
-  glfwGetFramebufferSize(g_window, &buffer_width, &buffer_height);
+  glfwGetFramebufferSize(gWindow, &buffer_width, &buffer_height);
 
   // Set context for GLEW to use
-  glfwMakeContextCurrent(g_window);
+  glfwMakeContextCurrent(gWindow);
 
   // Allow modern extension features
   glewExperimental = GL_TRUE;
 
   if (glewInit() != GLEW_OK) {
     std::cout << "GLEW initialization failed!\n";
-    glfwDestroyWindow(g_window);
+    glfwDestroyWindow(gWindow);
     glfwTerminate();
     return false;
   }
@@ -94,7 +125,7 @@ bool InitOpenGL() {
   // Setup Viewport size
   glViewport(0, 0, buffer_width, buffer_height);
 
-  glfwSetKeyCallback(g_window, OnKey);
+  glfwSetKeyCallback(gWindow, OnKey);
 
   return true;
 }
@@ -145,4 +176,79 @@ float NormalizeColor(int value) {
     ret = static_cast<float>(value % (kColorMax + 1)) / kColorMax;
   }
   return ret;
+}
+
+void CreateTriangle() {
+  // clang-format off
+  GLfloat vertices[] = {
+      -1.0f, -1.0f,  0.0f,
+       1.0f, -1.0f,  0.0f,
+       0.0f,  1.0f,  0.0f
+  };
+  // clang-format on
+
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+  glEnableVertexAttribArray(0);
+
+  // Unbind
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+}
+
+void AddShader(GLuint program, char const* shader_code, GLenum type) {
+  GLuint shader = glCreateShader(type);
+  GLchar const* code[1];
+  code[0] = shader_code;
+
+  GLint code_length[1];
+  code_length[0] = strlen(shader_code);
+  glShaderSource(shader, 1, code, code_length);
+
+  GLint result = 0;
+  GLchar result_log[1024] = {0};
+  glCompileShader(shader);
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
+  if (!result) {
+    glGetProgramInfoLog(shader, sizeof(result_log), nullptr, result_log);
+    std::cerr << "Error compiling the " << type << " shader: " << result_log << "\n";
+    exit(EXIT_FAILURE);
+  }
+
+  glAttachShader(program, shader);
+}
+
+void CompileShaders() {
+  gShader = glCreateProgram();
+  if (!gShader) {
+    std::cerr << "Error creating shader program\n";
+    exit(EXIT_FAILURE);
+  }
+
+  AddShader(gShader, vShader, GL_VERTEX_SHADER);
+  AddShader(gShader, fShader, GL_FRAGMENT_SHADER);
+
+  GLint result = 0;
+  GLchar result_log[1024] = {0};
+  glLinkProgram(gShader);
+  glGetProgramiv(gShader, GL_LINK_STATUS, &result);
+  if (!result) {
+    glGetProgramInfoLog(gShader, sizeof(result_log), nullptr, result_log);
+    std::cerr << "Error linking program: " << result_log << "\n";
+    exit(EXIT_FAILURE);
+  }
+
+  glValidateProgram(gShader);
+  glGetProgramiv(gShader, GL_VALIDATE_STATUS, &result);
+  if (!result) {
+    glGetProgramInfoLog(gShader, sizeof(result_log), nullptr, result_log);
+    std::cerr << "Error validating program: " << result_log << "\n";
+    exit(EXIT_FAILURE);
+  }
 }
