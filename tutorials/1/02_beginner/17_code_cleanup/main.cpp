@@ -13,22 +13,7 @@
 
 static GLint const kWidth{800};
 static GLint const kHeight{600};
-static auto const* const kAppTitle = "TEO";
-
-// Each iteration of the main loop will the `gTriOffset` will increment by `kTriIncrement` and when it will reach
-// `kTriMaxOffset`, it will toggle the `gDirection`.
-GLuint gUniformModel;  // How much to move
-auto kTriIncrement{0.01f};
-auto gDirection{true};  // true - To the right; false - To the left
-auto gTriOffset{0.0f};
-auto kTriMaxOffset{0.7f};
-
-auto gSizeDirection{true};
-auto gCurSize{0.4f};
-auto kMaxSize{0.8f};
-auto kMinSize{0.1f};
-
-auto gCurAngle{0.0f};
+static auto const* const kAppTitle = "Title";
 
 auto kToRadians{3.14159265f / 180.f};
 
@@ -56,39 +41,11 @@ int main() {
                                           0.1f,
                                           100.0f);
 
-  // Loop until window closed
   while (!main_window.GetShouldClose()) {
     main_window.ShowFPS();
 
     // Get + Handle user input events
     glfwPollEvents();
-
-    if (gDirection) {
-      gTriOffset += kTriIncrement;
-    } else {
-      gTriOffset -= kTriIncrement;
-    }
-
-    if (std::abs(gTriOffset) >= kTriMaxOffset) {
-      gDirection = !gDirection;
-    }
-
-    gCurAngle += 0.5f;
-
-    // Reset angle
-    if (gCurAngle >= 360) {
-      gCurAngle -= 360;
-    }
-
-    if (gSizeDirection) {
-      gCurSize += 0.007f;
-    } else {
-      gCurSize -= 0.007f;
-    }
-
-    if (gCurSize >= kMaxSize || gCurSize < kMinSize) {
-      gSizeDirection = !gSizeDirection;
-    }
 
     // Clear window
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -99,16 +56,16 @@ int main() {
     uniform_projection = gShaderList[0]->GetProjectionLocation();
 
     glm::mat4 model{1.0f};
-    model = glm::translate(model, glm::vec3(gTriOffset, 0.0f, -2.5f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
     model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
     glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
     gMeshList[0]->RenderMesh();
 
     model = glm::mat4{1.0f};
-    model = glm::translate(model, glm::vec3(-gTriOffset, 1.0f, -2.5f));
+    model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
     model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
-    glUniformMatrix4fv(gUniformModel, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     gMeshList[1]->RenderMesh();
 
     glUseProgram(0);
@@ -117,7 +74,7 @@ int main() {
   }
 
   glfwTerminate();
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void CreateShaders() {
@@ -142,8 +99,6 @@ void CreateObjects() {
   };
   // clang-format on
 
-  // Mesh* mesh1 = new Mesh();
-  // mesh1->CreateMesh(vertices, indices, 12, 12);
   gMeshList.emplace_back(new Mesh);
   gMeshList.emplace_back(new Mesh);
   gMeshList[0]->CreateMesh(vertices, indices, 12, 12);
