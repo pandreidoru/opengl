@@ -4,6 +4,7 @@
   - [Documentation](#documentation)
     - [Tutorials](#tutorials)
     - [Websites](#websites)
+    - [Books](#books)
   - [Basic steps for creating shaders](#basic-steps-for-creating-shaders)
   - [Vertex Buffer Object Layout](#vertex-buffer-object-layout)
   - [Install](#install)
@@ -23,10 +24,22 @@
 
 ### Websites
 
-- [khronos - OpenGL](https://www.khronos.org/opengl/wiki/Main_Page)
+- [docs.GL - API Reference](http://docs.gl/)
 - [open.gl](https://open.gl/)
+- [khronos - OpenGL](https://www.khronos.org/opengl/wiki/Main_Page)
 - [learnopengl](https://learnopengl.com/Introduction)
 - [ogldev](http://ogldev.atspace.co.uk/)
+- [Anton's OpenGL 4 Tutorials](https://antongerdelan.net/opengl/)
+
+### Books
+
+- [Reference Cards](https://www.khronos.org/developers/reference-cards/)
+- [Anton's OpenGL 4 Tutorials](https://www.amazon.com/gp/product/B00LAMQYF2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B00LAMQYF2&linkCode=as2&tag=drantger-20&linkId=31e011e15c43803bca938150e5038782)
+- [Computer Graphics Programming in OpenGL with C++](https://www.amazon.com/Computer-Graphics-Programming-OpenGL-C/dp/1683922212)
+- [OpenGL Programming Guide: The Official Guide to Learning OpenGL, Version 4.5 with SPIR-V 9th Edition](https://www.amazon.com/OpenGL-Programming-Guide-Official-Learning/dp/0134495497/ref=pd_sbs_14_1/138-8200178-1350956?_encoding=UTF8&pd_rd_i=0134495497&pd_rd_r=5afa904d-add1-4fd8-85b0-34b3789e28b6&pd_rd_w=yF5uX&pd_rd_wg=Ov6Oy&pf_rd_p=ed1e2146-ecfe-435e-b3b5-d79fa072fd58&pf_rd_r=J6ZXEB1ARRQ0ZG1BZ8JW&psc=1&refRID=J6ZXEB1ARRQ0ZG1BZ8JW)
+- [OpenGL 4 Shading Language Cookbook: Build high-quality, real-time 3D graphics with OpenGL 4.6, GLSL 4.6 and C++17, 3rd Edition](https://www.amazon.com/OpenGL-Shading-Language-Cookbook-high-quality/dp/1789342252/ref=sr_1_1?dchild=1&keywords=OpenGL+4.0+Shading+Language+Cookbook&qid=1607437662&s=books&sr=1-1)
+- [OpenGL Superbible: Comprehensive Tutorial and Reference 7th Edition](https://www.amazon.com/OpenGL-Superbible-Comprehensive-Tutorial-Reference/dp/0672337479/ref=sr_1_1?dchild=1&keywords=OpenGL+Superbible&qid=1607435300&s=books&sr=1-1)
+- [Real-Time Rendering, Fourth Edition 4th Edition](https://www.amazon.com/Real-Time-Rendering-Fourth-Tomas-Akenine-M%C3%B6ller/dp/1138627003/ref=pd_sbs_14_3/138-8200178-1350956?_encoding=UTF8&pd_rd_i=1138627003&pd_rd_r=5afa904d-add1-4fd8-85b0-34b3789e28b6&pd_rd_w=yF5uX&pd_rd_wg=Ov6Oy&pf_rd_p=ed1e2146-ecfe-435e-b3b5-d79fa072fd58&pf_rd_r=J6ZXEB1ARRQ0ZG1BZ8JW&psc=1&refRID=J6ZXEB1ARRQ0ZG1BZ8JW)
 
 ## Basic steps for creating shaders
 
