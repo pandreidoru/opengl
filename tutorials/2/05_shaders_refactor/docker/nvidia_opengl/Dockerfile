@@ -18,7 +18,6 @@ RUN apt-get update \
         apt-utils \
         build-essential \
         cmake \
-        cppcheck \
         g++ \
         gcc \
         gdb \
@@ -75,11 +74,4 @@ RUN git clone https://github.com/glfw/glfw.git \
     && cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON .. \
     && make -j4 install \
     && ldconfig \
-    && cd ${WORKSPACE} && rm -rf ${WORKSPACE}/*
-
-# GLM
-RUN wget https://github.com/g-truc/glm/archive/0.9.9.8.tar.gz \
-    && tar xzvf 0.9.9.8.tar.gz \
-    && cd glm-0.9.9.8 \
-    && mv glm /usr/include \
     && cd ${WORKSPACE} && rm -rf ${WORKSPACE}/*
