@@ -8,7 +8,7 @@ function usage() {
     echo "-h | --help   This message"
 }
 
-IMAGE_NAME="nvidia_opengl"
+IMAGE_NAME="nvidia/opengl"
 IMAGE_TAG="1.2-glvnd-devel-ubuntu20.04"
 
 # Iterate through command line inputs.
