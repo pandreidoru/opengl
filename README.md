@@ -8,11 +8,15 @@
   - [Basic steps for creating shaders](#basic-steps-for-creating-shaders)
   - [Vertex Buffer Object Layout](#vertex-buffer-object-layout)
   - [Coordinate Systems](#coordinate-systems)
-    - [Local Space](#local-space)
-    - [World Space](#world-space)
-    - [View Space](#view-space)
-    - [Clip Space (Normalized Device Coords)](#clip-space-normalized-device-coords)
-    - [Screen Space](#screen-space)
+    - [Orientation of the axes](#orientation-of-the-axes)
+    - [Types of Spaces](#types-of-spaces)
+      - [Local Space (Object Space)](#local-space-object-space)
+      - [World Space](#world-space)
+      - [View Space / Camera Space / View Space / Eye Space](#view-space--camera-space--view-space--eye-space)
+      - [Clip Space (Normalized Device Coords)](#clip-space-normalized-device-coords)
+      - [Screen Space](#screen-space)
+    - [Coordinate Space Transformations](#coordinate-space-transformations)
+      - [Projection Matrix](#projection-matrix)
   - [Glossary](#glossary)
 
 ## Documentation
@@ -126,27 +130,55 @@
 
 - All layouts
 
-![Vertex Buffer Object Layout](vertex_buffer_object_layouts.png)
+![Vertex Buffer Object Layout](resources/vertex_buffer_object_layouts.png)
 
 - Position layout
 
-![Vertex Buffer Object Layout](vertex_buffer_object_layout_position.png)
+![Vertex Buffer Object Layout](resources/vertex_buffer_object_layout_position.png)
 
 - Interleaved layout
 
-![Vertex Buffer Object Layout](vertex_buffer_object_layout_interleaved.png)
+![Vertex Buffer Object Layout](resources/vertex_buffer_object_layout_interleaved.png)
 
 ## Coordinate Systems
 
-### Local Space
+### Orientation of the axes
 
-### World Space
+- ![Right vs Left Handed Coordinate Systems](resources/right_vs_left_handed_coord_system.png)
 
-### View Space
+### Types of Spaces
 
-### Clip Space (Normalized Device Coords)
+#### Local Space (Object Space)
 
-### Screen Space
+- Game artists work in (where they build objects)
+- They use Maya, 3ds Max, Blender
+
+#### World Space
+
+- The space the player is walking in
+
+#### View Space / Camera Space / View Space / Eye Space
+
+- What the user sees, like looking through the camera lens
+- The pyramid shape defines what the camera can see
+- Everything is relative to the camera position
+- The world is moving around the camera
+
+#### Clip Space (Normalized Device Coords)
+
+#### Screen Space
+
+### Coordinate Space Transformations
+
+![Coordinate Space Transformations](resources/coord_space_transf.png)
+
+![Transforming a vertex](resources/transforming_a_vertex.png)
+
+#### Projection Matrix
+
+![Perspective vs Orthographic Projections](resources/perspective_vs_othographic_projections.png)
+
+- Orthographic - Doesn't take in account the depth
 
 ## Glossary
 
@@ -181,3 +213,6 @@
   - An abstraction layer that sends OpenGL calls to one of potentially many drivers
   - It allows multiple drivers from different vendors to coexist on the same filesystem, and determines which vendor to dispatch each API call to at runtime
   - [Architecture](https://github.com/NVIDIA/libglvnd#architecture)
+- **NDC**
+  - Normalized Device Coordinates
+
