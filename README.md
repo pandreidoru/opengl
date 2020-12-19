@@ -72,7 +72,7 @@
    ```
 
 2. Create Fragment Shader
-3. Compile the shaders
+3. Compile the Shaders
 
    ```C++
    glCompileShader(vs);
@@ -144,7 +144,7 @@
 
 ### Orientation of the axes
 
-- ![Right vs Left Handed Coordinate Systems](resources/right_vs_left_handed_coord_system.png)
+![Right vs Left Handed Coordinate Systems](resources/right_vs_left_handed_coord_system.png)
 
 ### Types of Spaces
 
