@@ -13,7 +13,7 @@
     - [Types of Spaces](#types-of-spaces)
       - [Local Space (Object Space)](#local-space-object-space)
       - [World Space](#world-space)
-      - [View Space / Camera Space / View Space / Eye Space](#view-space--camera-space--view-space--eye-space)
+      - [View Space (Camera/Eye Space)](#view-space-cameraeye-space)
         - [Description](#description)
         - [View Matrix](#view-matrix)
         - [Moving the Camera](#moving-the-camera)
@@ -169,7 +169,7 @@
 
 - The space the player is walking in
 
-#### View Space / Camera Space / View Space / Eye Space
+#### View Space (Camera/Eye Space)
 
 ##### Description
 
@@ -187,7 +187,7 @@
 
 - **P** - *Position* - The position of the camera in the World
 - **R** - *Right* - Vector facing right of the camera (x-axis). Can calculate by doing the cross product of Direction vector and "up" world's vector ([0, 1, 0])
-- **U** - *Up* - Upwards relative to where camera is facing. Can calculate by doing the cross product of Direction and Right vectors
+- **U** - *Up* - Upwards relative to where camera is facing. Can calculate by doing the cross product of Right and Direction vectors
 - **F** - *Forward* - The direction the camera is looking in. Is negative because the world is moving in the opposite direction of the camera
 - View Matrix could be computed using `glm::lookAt(position, target, up)`
   - *position* - Camera position
