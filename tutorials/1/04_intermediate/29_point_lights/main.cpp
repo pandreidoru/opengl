@@ -49,24 +49,26 @@ int main() {
 
   auto brick_texture = Texture("../textures/brick.png");
   auto dirt_texture = Texture("../textures/dirt.png");
+  auto plain_texture = Texture("../textures/plain.png");
   brick_texture.Load();
   dirt_texture.Load();
+  plain_texture.Load();
 
   auto main_light = DirectionalLight(1, 1, 1,
-                                     0.1, 0.3,
+                                     0, 0,
                                      0, 0, -1);
   PointLight point_lights[kMaxPointLights];
   point_lights[0] = PointLight(0, 0, 1,
-                               0.1, 0.4,
-                               4, 0, 0,
+                               0, 1,
+                               0, 0, 0,
                                0.3, 0.2, 0.1);
   point_lights[1] = PointLight(0, 1, 0,
-                               0.1, 1.0,
+                               0, 1.0,
                                -4, 2, 0,
                                0.3, 0.1, 0.1);
   unsigned int point_light_count = 2;
 
-  auto shiny_material = Material(1, 32);
+  auto shiny_material = Material(4, 256);
   auto dull_material = Material(0.3, 4);
 
   auto uniform_model = gShaderList[0]->GetModelLocation();
@@ -124,6 +126,14 @@ int main() {
     dirt_texture.Use();
     dull_material.Use(uniform_specular_intensity, uniform_shininess);
     gMeshList[1]->RenderMesh();
+
+    model = glm::mat4{1.0f};
+    model = glm::translate(model, glm::vec3(0, -2, 0));
+    // model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    plain_texture.Use();
+    shiny_material.Use(uniform_specular_intensity, uniform_shininess);
+    gMeshList[2]->RenderMesh();
 
     glUseProgram(0);
 
@@ -190,7 +200,6 @@ void CreateObjects() {
        1.0f, -1.0f, -0.6f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
        0.0f,  1.0f,  0.0f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f
   };
-  // clang-format on
 
   unsigned int indices[] = {
       0, 3, 1,
@@ -199,10 +208,25 @@ void CreateObjects() {
       0, 1, 2
   };
 
+  unsigned int floor_indices[] = {
+      0, 2, 1,
+      1, 2, 3
+  };
+
+  GLfloat floor_vertices[] = {
+      -10.0f,  0.0f, -10.0f,  0.0f,  0.0f, 0.0f, -1.0f, 0.0f,
+       10.0f,  0.0f, -10.0f, 10.0f,  0.0f, 0.0f, -1.0f, 0.0f,
+      -10.0f,  0.0f,  10.0f,  0.0f, 10.0f, 0.0f, -1.0f, 0.0f,
+       10.0f,  0.0f,  10.0f, 10.0f, 10.0f, 0.0f, -1.0f, 0.0f
+  };
+  // clang-format on
+
   CalcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
   gMeshList.emplace_back(new Mesh);
   gMeshList.emplace_back(new Mesh);
+  gMeshList.emplace_back(new Mesh);
   gMeshList[0]->CreateMesh(vertices, indices, 32, 12);
   gMeshList[1]->CreateMesh(vertices, indices, 32, 12);
+  gMeshList[2]->CreateMesh(floor_vertices, floor_indices, 32, 6);
 }
