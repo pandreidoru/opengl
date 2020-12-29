@@ -9,10 +9,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "camera.h"
+#include "common_values.h"
 #include "directional_light.h"
 #include "gl_window.h"
 #include "material.h"
 #include "mesh.h"
+#include "point_light.h"
 #include "shader.h"
 #include "texture.h"
 
@@ -53,6 +55,17 @@ int main() {
   auto main_light = DirectionalLight(1, 1, 1,
                                      0.1, 0.3,
                                      0, 0, -1);
+  PointLight point_lights[kMaxPointLights];
+  point_lights[0] = PointLight(0, 0, 1,
+                               0.1, 0.4,
+                               4, 0, 0,
+                               0.3, 0.2, 0.1);
+  point_lights[1] = PointLight(0, 1, 0,
+                               0.1, 1.0,
+                               -4, 2, 0,
+                               0.3, 0.1, 0.1);
+  unsigned int point_light_count = 2;
+
   auto shiny_material = Material(1, 32);
   auto dull_material = Material(0.3, 4);
 
@@ -94,6 +107,7 @@ int main() {
                 camera.GetCameraPosition().z);
 
     gShaderList[0]->SetDirectionalLight(&main_light);
+    gShaderList[0]->SetPointLights(point_lights, point_light_count);
 
     glm::mat4 model{1.0f};
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));

@@ -27,8 +27,8 @@ class Shader {
   GLuint GetProjectionLocation() const;
   GLuint GetAmbientColourLocation() const;
   GLuint GetAmbientIntensityLocation() const;
-  GLuint GetDirectionLocation() const;
   GLuint GetDiffuseIntensityLocation() const;
+  GLuint GetDirectionLocation() const;
   GLuint GetEyePosLocation() const;
   GLuint GetSpecularIntensityLocation() const;
   GLuint GetShininessLocation() const;

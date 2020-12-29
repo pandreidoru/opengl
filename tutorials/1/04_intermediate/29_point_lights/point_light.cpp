@@ -4,7 +4,7 @@
 
 #include "point_light.h"
 
-PointLight::PointLight() {}
+PointLight::PointLight() = default;
 
 PointLight::PointLight(GLfloat red, GLfloat green, GLfloat blue,
                        GLfloat ambient_intensity, GLfloat diffuse_intensity,
@@ -16,9 +16,7 @@ PointLight::PointLight(GLfloat red, GLfloat green, GLfloat blue,
       linear_{linear},
       exponent_{exponent} {}
 
-PointLight::~PointLight() {
-
-}
+PointLight::~PointLight() = default;
 
 void PointLight::Use(GLuint ambient_intensity_location,
                      GLuint ambient_colour_location,

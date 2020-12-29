@@ -15,7 +15,7 @@ class Light {
   virtual ~Light();
 
  protected:
-  glm::vec3 colour_{1.0f, 1.0f, 1.0f};  // how much of the texture colour will be visible
+  glm::vec3 colour_{1, 1, 1};  // how much of the texture colour will be visible
   GLfloat ambient_intensity_{1};
   GLfloat diffuse_intensity_{0};
 };

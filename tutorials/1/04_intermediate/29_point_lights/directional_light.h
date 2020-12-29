@@ -11,7 +11,7 @@ class DirectionalLight : public Light {
                    GLfloat ambient_intensity,
                    GLfloat diffuse_intensity,
                    GLfloat x_dir, GLfloat y_dir, GLfloat z_dir);
-  virtual ~DirectionalLight();
+  ~DirectionalLight() override;
 
   void Use(GLuint ambient_intensity_location, GLuint ambient_colour_location,
            GLuint diffuse_intensity_location, GLuint direction_location) const;
