@@ -7,6 +7,8 @@
     - [Specular Lighting](#specular-lighting)
   - [Types of Light](#types-of-light)
     - [Directional Light](#directional-light)
+    - [Point Light](#point-light)
+    - [Spot Light](#spot-light)
 
 ## Phong Lighting Model
 
@@ -96,7 +98,67 @@ Consists of 3 parts:
 
 ### Directional Light
 
+- ![Directional Light](resources/directional_light.png)
 - A light without a position or source. All light is coming as parallel rays from an seemingly infinite distance. Ex: the Sun
 - Requires only basic information: colour, ambient, diffuse, specular and a direction
 - Treat all light calculations using the same direction for the light vector
 - Don't need to calculate a light vector
+
+### Point Light
+
+- ![Point Light](resources/point_light.png)
+- A light with a position that emits lights in all directions. Ex: a lightbulb
+- Need to determine direction vector manually
+- Get difference between light position and fragment position
+- Apply directional lighting maths to the calculated direction vector
+- Attenuation
+  - Directional Lights simulate infinite distance, so distance doesn't affect the lighting power
+  - Point Lights have positions => distance from point being lit changes power of lighting
+  - One possible solution: Linear drop-off
+    - Have the lighting power drop off in direct proportion with the distance of the light source
+    - Simple, but not very realistic
+  - In reality, light intensity initially drops quickly with distance, but the further you are, the slower it decreases
+  - For positive values, the reciprocal of quadratic function can create this effect: _1/(ax<sup>2</sup> + bx + c)_
+  - ![Reciprocal of quadratic function](resources/reciprocal_of_quadratic.png)
+  - _Attenuation factor = 1 / (quadratic * distance<sup>2</sup> + linear * distance + constant)
+    - *quadratic* - User-defined value, usually the lowest of the tree
+    - *distance* - Distance between the light source and the fragment
+    - *linear* - User-defined value, lower than *constant*
+    - *constant* - Usually 1.0 to ensure denominator is always greater than 1. Ex: if denominator is 0.8, then 1.0/0.5 = 2.0, so attenuation will double power of light beyond its set value, which is not desired
+    - Check [Ogre3d - Point Light Attenuation](http://wiki.ogre3d.org/-Point+Light+Attenuation) for useful values
+  - Attenuation needs to be applied to ambient, diffuse and specular lights
+
+### Spot Light
+
+- ![Sport Light](resources/spot_light.png)
+- Similar to a Point Light, but cut down to emit in a certain range, with a certain angle. Ex: a flashlight
+- Have position and use attenuation
+- It has also
+  - *Direction* - Where the sport light is facing
+  - *Cut-off angle* - The angle describing the "edges" of the light, from the direction vector
+- How to check if a fragment is inside the cut-off angle
+  - _angle_to_fragment = light_vector &#8226; light_direction_
+    - *light_vector* - The vector from the light to the fragment
+    - *light_direction* - The direction the Sport Light is facing
+    - The *angle_to_fragment* will be a value between 0 and 1, representing the angle between the two => *cos(cut_off_angle)*
+  - Larger value: smaller angle; smaller value: larger angle
+  - If the *angle_to_fragment* is larger than *cos(cut_off_angle)* => apply lighting
+  - If the *angle_to_fragment* is smaller than *cos(cut_off_angle)* => it has a grater angle than the *cut_off_angle* => don't apply lighting
+- Soft edges
+  - Above approach has sharp cut-off at edges of spot
+  - Creates unrealistic spot light (although might be good for retro video game effect)
+  - Need a way to soften when approaching edges of cut-off range
+  - Use the dot product result from before as a factor
+  - Issue: Due to select range, dot product won't scale very well
+  - Ex: If cu-off is 10&deg;
+    - Minimum dot product is *cos(10&deg;) = 0.98*
+    - Dot product range will be 0.98 - 1.00
+    - Using dot product to fade edge will be almost unnoticeable
+  - Solution: Scale dot product range to 0 - 1
+  - Formula to scale value between ranges
+    - _new_value = (new_range_max - new_range_min)(original_value - original_range_min) / (original_range_max - original_range_min)_
+      - *new_range_min = 0*
+      - *new_range_max = 1*
+    - _spot_light_fade = 1 - (1 - angle_to_fragment)/(1 - cut_off_angle)_
+  - After calculating Spot Light lighting, multiply by *spot_light_fade*
+  - _colour = spot_light_colour * spot_light_fade_
