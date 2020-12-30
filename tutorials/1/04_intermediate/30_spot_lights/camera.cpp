@@ -54,8 +54,12 @@ void Camera::MouseControl(GLfloat x_change, GLfloat y_change) {
   Update();
 }
 
-glm::vec3 Camera::GetCameraPosition() {
+glm::vec3 Camera::GetCameraPosition() const {
   return position_;
+}
+
+glm::vec3 Camera::GetCameraDirection() const {
+  return glm::normalize(front_);
 }
 
 glm::mat4 Camera::CalculateViewMatrix() {

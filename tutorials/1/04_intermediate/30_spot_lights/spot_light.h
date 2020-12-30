@@ -21,6 +21,9 @@ class SpotLight : PointLight {
            GLuint constant_location, GLuint linear_location, GLuint exponent_location,
            GLuint edge_location) const;
 
+  // Set light source to a new `position` with a specific `direction`
+  void SetFlash(glm::vec3 position, glm::vec3 direction);
+
  private:
   glm::vec3 direction_{0, -1, 0};
   GLfloat edge_{0};  // the light angle in degrees

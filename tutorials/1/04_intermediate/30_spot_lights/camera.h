@@ -20,7 +20,8 @@ class Camera {
   void KeyControl(bool const* keys, GLfloat delta_time);
   void MouseControl(GLfloat x_change, GLfloat y_change);
 
-  glm::vec3 GetCameraPosition();
+  glm::vec3 GetCameraPosition() const;
+  glm::vec3 GetCameraDirection() const;
 
   glm::mat4 CalculateViewMatrix();
 

@@ -72,12 +72,18 @@ int main() {
 
   SpotLight spot_lights[kMaxSpotLights];
   spot_lights[0] = SpotLight(1, 1, 1,
-                             0, 1,
+                             0, 2,
                              0, 0, 0,
                              0, -1, 0,
-                             0.3, 0.2, 0.1,
+                             1, 0, 0,
                              20);
-  unsigned int spot_light_count = 1;
+  spot_lights[1] = SpotLight(1, 1, 1,
+                             0, 1,
+                             0, -1.5, 0,
+                             -100, -1, 0,
+                             1, 0, 0,
+                             20);
+  unsigned int spot_light_count = 2;
 
   auto shiny_material = Material(4, 256);
   auto dull_material = Material(0.3, 4);
@@ -118,6 +124,13 @@ int main() {
                 camera.GetCameraPosition().x,
                 camera.GetCameraPosition().y,
                 camera.GetCameraPosition().z);
+
+    // Place the light a little lower than the camera to mimic a flash-light held in the hand and not in the eye
+    glm::vec3 lower_light = camera.GetCameraPosition();
+    lower_light.y -= 0.3;
+
+    // Move the source light together with the camera
+    spot_lights[0].SetFlash(lower_light, camera.GetCameraDirection());
 
     gShaderList[0]->SetDirectionalLight(&main_light);
     gShaderList[0]->SetPointLights(point_lights, point_light_count);
