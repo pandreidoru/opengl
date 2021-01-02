@@ -6,6 +6,9 @@
     - [Websites](#websites)
     - [Books](#books)
     - [Videos](#videos)
+    - [Resources](#resources)
+      - [Textures](#textures)
+      - [Models](#models)
   - [Glossary](#glossary)
 
 ## Documentation
@@ -39,6 +42,16 @@
 
 - [Math for Game Developers - Jorge Rodriguez](https://www.youtube.com/watch?v=sKCF8A3XGxQ&list=PLW3Zl3wyJwWOpdhYedlD-yCB7WQoHf-My&ab_channel=JorgeRodriguez)
 
+### Resources
+
+#### Textures
+
+- [Textures](https://www.textures.com/)
+
+#### Models
+
+- [Free3D](https://free3d.com/)
+
 ## Glossary
 
 - **GLEW**
@@ -58,19 +71,19 @@
 - **GLFW**
   - *OpenGL FrameWork* (probably)
   - Handles window creation and control
-  - Pick up and process input from the keyboard, mouse, joystick and gamepad
+  - Pick up and process input from the keyboard, mouse, joystick and game-pad
   - Multiple monitors support
   - Uses OpenGL context for windows
   - Alternatives
     - **SDL** - *Simple DirectMedia Layer*
-      - Can do almost everything GLFW can do and more (audio, threading, filesystems, etc.)
+      - Can do almost everything GLFW can do and more (audio, threading, file-system, etc.)
     - **SFML** - *Simple and Fast Multimedia Library*
       - Like SDL, but with even more features
       - But the OpenGL context is very weak. Based on 2D only graphics
 - **[glvnd](https://github.com/NVIDIA/libglvnd#architecture)**
   - *GL Vendor-Neutral Dispatch Library*
   - An abstraction layer that sends OpenGL calls to one of potentially many drivers
-  - It allows multiple drivers from different vendors to coexist on the same filesystem, and determines which vendor to dispatch each API call to at runtime
+  - It allows multiple drivers from different vendors to coexist on the same file-system, and determines which vendor to dispatch each API call to at run-time
   - [Architecture](https://github.com/NVIDIA/libglvnd#architecture)
 - **NDC**
   - Normalized Device Coordinates
