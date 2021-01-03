@@ -93,9 +93,11 @@ int main() {
 
   auto xwing = Model();
   auto blackhawk = Model();
+  auto lego = Model();
 
   xwing.Load("../models/x-wing.obj");
   blackhawk.Load("../models/uh60.obj");
+  lego.Load("../models/LEGO.Creator_Plane.obj");
 
   auto uniform_model = gShaderList[0]->GetModelLocation();
   auto uniform_view = gShaderList[0]->GetViewLocation();
@@ -185,6 +187,14 @@ int main() {
     glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     shiny_material.Use(uniform_specular_intensity, uniform_shininess);
     blackhawk.Render();
+
+    model = glm::mat4{1.0f};
+    model = glm::translate(model, glm::vec3(5, 0, 0));
+    // model = glm::rotate(model, -90 * kToRadians, glm::vec3(1, 0, 0));
+    model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    shiny_material.Use(uniform_specular_intensity, uniform_shininess);
+    lego.Render();
 
     glUseProgram(0);
 

@@ -135,6 +135,7 @@ void Model::LoadMaterials(aiScene const* scene) {
     }
 
     if (!texture_list_[i]) {
+      // texture_list_[i] = new Texture("../textures/brick.png");
       texture_list_[i] = new Texture("../textures/plain.png");
       texture_list_[i]->LoadA();
     }
